@@ -1,0 +1,32 @@
+Package: rbv2
+Title: Reproduce results from randombot-ng
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Depends: 
+    BBmisc,
+    mlr,
+    mlrCPO
+Imports:
+    data.table,
+    checkmate,
+    lgr
+Suggests:
+    testthat,
+    farff,
+    OpenML,
+    jsonlite,
+    parallelMap,
+    e1071,
+    glmnet,
+    rpart,
+    xgboost,
+    ranger,
+    RcppHNSW
