@@ -9,15 +9,17 @@
 #'    Number of cores to use. Set automatically if not provided by the user.
 #'  @param logfile `character`\cr
 #'    Logfile to write to.
-#'  @param parallel `list`\cr
-#'    Metrics to compute.
+#'  @param seed `character`\cr
+#'    Seed to set. Defaults to `NULL` (no seed).
+#'  @param extra_metrics `list`\cr
+#'    Additional metrics to compute. List of mlr metrics.
 #' @export
 #' @examples
 #'   learner_id = "classif.svm"
 #'   task_id = 3
 #'   configuration = list("gamma" = 0.1, cost  = 10, sample.rate = .1)
 #'   eval_config(learner_id, task_id, configuration)
-eval_config = function(learner, task_id, configuration, parallel = NULL, logfile = NULL,
+eval_config = function(learner, task_id, configuration, parallel = NULL, logfile = NULL, seed = NULL,
   extra_metrics = list(mlr::logloss, mlr::mmce, mlr::auc, mlr::f1, mlr::timetrain, mlr::timepredict)) {
   assert_list(configuration)
   task_id = fix_task(task_id)
@@ -44,7 +46,10 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   configuration = set_task_hyperpars(configuration, z, learner_id)
   lrn = setHyperPars(lrn, par.vals = configuration)
   lgr$info(sprintf("Hyperparameters: %s", config_to_string(configuration)))
-
+  if (!is.null(seed)) {
+    assert_int(seed)
+    set.seed(seed)
+  }
   bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = c(z$mlr.measures, extra_metrics))
   aggr = bmr$results[[1]][[1]]$aggr
   lgr$info(sprintf("Result: %s: %s", names(aggr), aggr))
