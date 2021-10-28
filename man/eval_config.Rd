@@ -2,19 +2,7 @@
 % Please edit documentation in R/evaluate_config.R
 \name{eval_config}
 \alias{eval_config}
-\title{Run an algorithm
-@param learner \code{character}\cr
-Learner name e.g. "classif.svm".
-@param task  \code{character}\cr
-OpenML Task ID of the corresponding task.
-@param configuration \code{list}\cr
-Named list of hyperparameters.
-@param parallel \code{integer}\cr
-Number of cores to use. Set automatically if not provided by the user.
-@param logfile \code{character}\cr
-Logfile to write to.
-@param parallel \code{list}\cr
-Metrics to compute.}
+\title{Run an algorithm}
 \usage{
 eval_config(
   learner,
@@ -22,12 +10,12 @@ eval_config(
   configuration,
   parallel = NULL,
   logfile = NULL,
+  seed = NULL,
   extra_metrics = list(mlr::logloss, mlr::mmce, mlr::auc, mlr::f1, mlr::timetrain,
     mlr::timepredict)
 )
 }
 \description{
-Run an algorithm
 @param learner \code{character}\cr
 Learner name e.g. "classif.svm".
 @param task  \code{character}\cr
@@ -35,11 +23,14 @@ OpenML Task ID of the corresponding task.
 @param configuration \code{list}\cr
 Named list of hyperparameters.
 @param parallel \code{integer}\cr
-Number of cores to use. Set automatically if not provided by the user.
+Number of cores to use. Set automatically to 1 if not provided by the user.
+Always set to 1 for xgboost to prevent paralellization errors.
 @param logfile \code{character}\cr
 Logfile to write to.
-@param parallel \code{list}\cr
-Metrics to compute.
+@param seed \code{character}\cr
+Seed to set. Defaults to \code{NULL} (no seed).
+@param extra_metrics \code{list}\cr
+Additional metrics to compute. List of mlr metrics.
 }
 \examples{
   learner_id = "classif.svm"

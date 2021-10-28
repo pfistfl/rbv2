@@ -13,13 +13,14 @@ RoxygenNote: 7.1.2
 Depends: 
     BBmisc,
     mlr,
-    mlrCPO
+    mlrCPO,
+    R (>= 2.10)
 Imports:
     data.table,
     checkmate,
     lgr
 Suggests:
-    testthat,
+    testthat (>= 3.0.0),
     farff,
     OpenML,
     jsonlite,
@@ -30,3 +31,4 @@ Suggests:
     xgboost,
     ranger,
     RcppHNSW
+Config/testthat/edition: 3

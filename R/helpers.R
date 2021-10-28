@@ -43,7 +43,7 @@ fix_task = Vectorize(function(task) {
 
 get_n_cores = function(parallel, learner, task_id) {
   if (is.null(parallel)) {
-    parallel = 10
+    parallel = 1
   }
   if (learner == "classif.xgboost") {
     parallel = 0
@@ -64,6 +64,7 @@ set_task_hyperpars = function(hpars, task, learner_id) {
   }
   if (learner_id == "classif.xgboost") {
     hpars[["nthread"]] = 1L
+    hpars[["eval_metric"]] = "merror"
   }
 
   if (learner_id == "classif.ranger") {

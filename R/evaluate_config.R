@@ -1,4 +1,5 @@
 #' Run an algorithm
+#'
 #'  @param learner `character`\cr
 #'    Learner name e.g. "classif.svm".
 #'  @param task  `character`\cr
@@ -6,7 +7,8 @@
 #'  @param configuration `list`\cr
 #'    Named list of hyperparameters.
 #'  @param parallel `integer`\cr
-#'    Number of cores to use. Set automatically if not provided by the user.
+#'    Number of cores to use. Set automatically to 1 if not provided by the user.
+#'    Always set to 1 for xgboost to prevent paralellization errors.
 #'  @param logfile `character`\cr
 #'    Logfile to write to.
 #'  @param seed `character`\cr
@@ -23,9 +25,13 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   extra_metrics = list(mlr::logloss, mlr::mmce, mlr::auc, mlr::f1, mlr::timetrain, mlr::timepredict)) {
   assert_list(configuration)
   task_id = fix_task(task_id)
-  learner_id = assert_choice(learner, paste0("classif.", c("rpart","glmnet","svm","knn","ranger","xgboost")))
-  parallelMap::parallelStartMulticore(get_n_cores(parallel, learner, task_id), level = "mlr.resample")
-  on.exit(parallelMap::parallelStop())
+  learner_id = assert_choice(learner, paste0("classif.", c("rpart","glmnet","svm","RcppHNSW","ranger.pow","xgboost")))
+
+  ncores = get_n_cores(parallel, learner, task_id)
+  if (ncores > 1) {
+    parallelMap::parallelStartMulticore(ncores, level = "mlr.resample")
+    on.exit(parallelMap::parallelStop())
+  }
 
   lgr = get_logger("eval_logger")$set_threshold("info")
   if (!is.null(logfile)) {
@@ -35,8 +41,9 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
 
   # Instantiate the preprocessing pipeline
   lrn = make_preproc_pipeline(learner_id)
-
   # Repair parameters
+  print(setdiff(names(getParamSet(lrn)$pars), names(configuration)))
+  print(setdiff(names(configuration), names(getParamSet(lrn)$pars)))
   ps = filterParams(getParamSet(lrn), names(configuration))
   configuration = parse_lgl(configuration)
   configuration = repairPoints2(ps, configuration[names(ps$pars)])
@@ -50,12 +57,68 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
     assert_int(seed)
     set.seed(seed)
   }
-  bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = c(z$mlr.measures, extra_metrics))
+
+  # Throw out non-multiclass measures for multiclass tasks
+  if (length(z$mlr.task$task.desc$class.levels > 2)) {
+    extra_metrics = extra_metrics[map_lgl(extra_metrics, function(x) "classif.multi" %in% x$properties)]
+  }
+  bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = union(z$mlr.measures, extra_metrics))
   aggr = bmr$results[[1]][[1]]$aggr
   lgr$info(sprintf("Result: %s: %s", names(aggr), aggr))
+  return(bmr)
+}
+
+
+#' Run an algorithm from rbv2
+#'
+
+#'  @param learner `character`\cr
+#'    Learner name e.g. "classif.svm".
+#'  @param task  `character`\cr
+#'    OpenML Task ID of the corresponding task.
+#'  @param configuration `list`\cr
+#'    Named list of hyperparameters.
+#'  @param ... `any`\cr
+#'    Arguments passed on to `eval_config`.
+#' @export
+#' @examples
+#'   learner_id = "rbv2_svm"
+#'   task_id = 3
+#'   configuration = list("gamma" = 0.1, cost  = 10, sample.rate = .1)
+#'   eval_rbv2(learner_id, task_id, configuration)
+eval_rbv2 = function(learner, task_id, configuration, ...) {
+  assert_true(grepl("rbv2_", learner))
+
+  if (learner == "rbv2_super") {
+    assert_true(!is.null(configuration$learner))
+    learner = paste0("rbv2_", configuration$learner)
+    configuration$learner = NULL
+  }
+  rbv2_name = gsub("rbv2_", "", learner)
+
+  if (learner == "rbv2_aknn") {
+    learner = "classif.RcppHNSW"
+  } else if (learner == "rbv2_ranger") {
+    learner = "classif.ranger.pow"
+  } else {
+    learner = gsub("rbv2_", "classif.", learner)
+  }
+
+  # Filter missing args
+  configuration = Filter(Negate(is.na), configuration)
+  configuration$repl = NULL
+  # Fix up configuration names
+  nms = names(configuration)
+  nms[nms == "trainsize"] = "sample.rate"
+  nms = gsub(paste0(rbv2_name, "."), "", nms)
+  names(configuration) = nms
+
+  task_id = data_to_task_id(task_id)
+  eval_config(learner, task_id, configuration, ...)
 }
 
 
 
-
-
+data_to_task_id = function(task_id) {
+    oml_task_info[oml_task_info$data.id %in%  as.integer(task_id), "task.id_cv10"]
+}
