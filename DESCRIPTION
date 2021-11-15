@@ -2,9 +2,8 @@ Package: rbv2
 Title: Reproduce results from randombot-ng
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Florian", "Pfisterer", "pfistererf@googlemail.com", role = c("aut", "cre"))
+Description: Reproduce results from the randombot-ng including seeds.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -14,7 +13,7 @@ Depends:
     BBmisc,
     mlr,
     mlrCPO,
-    R (>= 2.10)
+    R (>= 3.3)
 Imports:
     data.table,
     checkmate,
