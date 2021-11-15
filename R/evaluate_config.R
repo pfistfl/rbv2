@@ -42,9 +42,10 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   # Instantiate the preprocessing pipeline
   lrn = make_preproc_pipeline(learner_id)
   # Repair parameters
-  print(setdiff(names(getParamSet(lrn)$pars), names(configuration)))
-  print(setdiff(names(configuration), names(getParamSet(lrn)$pars)))
-  ps = filterParams(getParamSet(lrn), names(configuration))
+  # print(setdiff(names(getParamSet(lrn)$pars), names(configuration)))
+  # print(setdiff(names(configuration), names(getParamSet(lrn)$pars)))
+  ps = getParamSet(lrn)
+  ps = filterParams(ps, intersect(names(configuration), names(ps$pars)))
   configuration = parse_lgl(configuration)
   configuration = repairPoints2(ps, configuration[names(ps$pars)])
 
@@ -59,7 +60,7 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   }
 
   # Throw out non-multiclass measures for multiclass tasks
-  if (length(z$mlr.task$task.desc$class.levels > 2)) {
+  if (length(z$mlr.task$task.desc$class.levels) > 2) {
     extra_metrics = extra_metrics[map_lgl(extra_metrics, function(x) "classif.multi" %in% x$properties)]
   }
   bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = union(z$mlr.measures, extra_metrics))
@@ -122,3 +123,4 @@ eval_rbv2 = function(learner, task_id, configuration, ...) {
 data_to_task_id = function(task_id) {
     oml_task_info[oml_task_info$data.id %in%  as.integer(task_id), "task.id_cv10"]
 }
+
