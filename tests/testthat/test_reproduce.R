@@ -13,14 +13,14 @@ test_that("eval_point works", {
 })
 
 test_that("eval_point works", {
-  skip("Long")
+  skip("long")
   for (i in 1:10) {
     x = super_evals[[i]]$METADATA
     ll = eval(parse(text = x$point))
     task = strsplit(x$task, ".", fixed = TRUE)[[1]]
     task = task[length(task)]
     y = super_evals[[i]]$performances
-    if (sum(y[1:10, "timetrain"]) < 10) {
+    if (sum(y[1:10, "timetrain"]) < 20) {
       bmr = eval_rbv2("rbv2_glmnet", task, ll, seed=x$seed)
       out = bmr[[1]][[1]][[1]]$measures.test
       expect_true(all(y[1:10, 'logloss'] - out$logloss < 1e-8))
@@ -32,10 +32,3 @@ test_that("eval_point works", {
     }
   }
 })
-
-
-
-
-
-df = df[sample(length(df), 10)]
-

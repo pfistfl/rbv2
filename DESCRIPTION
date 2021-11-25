@@ -10,10 +10,10 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: 
-    BBmisc,
-    mlr,
-    mlrCPO,
-    R (>= 3.3)
+    BBmisc (== 1.11),
+    mlr (== 2.13.9000),
+    mlrCPO (== 0.3.4-2),
+    R (>= 3.5)
 Imports:
     data.table,
     checkmate,
@@ -24,10 +24,11 @@ Suggests:
     OpenML,
     jsonlite,
     parallelMap,
-    e1071,
-    glmnet,
-    rpart,
-    xgboost,
-    ranger,
-    RcppHNSW
+    ParamHelpers (== 1.12),
+    e1071 (== 1.7-0.1),
+    glmnet (== 2.0-16),
+    rpart (== 4.1-13),
+    xgboost (== 0.82.1),
+    ranger (== 0.11.2),
+    RcppHNSW (== 0.1.0)
 Config/testthat/edition: 3

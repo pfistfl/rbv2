@@ -72,9 +72,8 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
 
 #' Run an algorithm from rbv2
 #'
-
 #'  @param learner `character`\cr
-#'    Learner name e.g. "classif.svm".
+#'    Learner name e.g. "rbv2-super".
 #'  @param task  `character`\cr
 #'    OpenML Task ID of the corresponding task.
 #'  @param configuration `list`\cr
@@ -119,8 +118,6 @@ eval_rbv2 = function(learner, task_id, configuration, ...) {
 }
 
 
-
 data_to_task_id = function(task_id) {
-    oml_task_info[oml_task_info$data.id %in%  as.integer(task_id), "task.id_cv10"]
+  oml_task_info[oml_task_info$data.id %in%  as.integer(task_id), "task.id_cv10"]
 }
-

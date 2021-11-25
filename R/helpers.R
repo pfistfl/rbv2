@@ -38,6 +38,7 @@ fix_task = Vectorize(function(task) {
   if (task == 168759) task = 167211 # Satellite
   if (task == 168761) task = 168912 # sylvine
   if (task == 168770) task = 168909 # Dilbert
+  if (task == 168767) task = 190411 # Ada
   return(task)
 })
 
@@ -64,11 +65,15 @@ set_task_hyperpars = function(hpars, task, learner_id) {
   }
   if (learner_id == "classif.xgboost") {
     hpars[["nthread"]] = 1L
-    hpars[["eval_metric"]] = "merror"
+    if (length(task$mlr.task$task.desc$class.levels) == 2) {
+      hpars[["eval_metric"]] = "error"
+    } else {
+      hpars[["eval_metric"]] = "merror"
+    }
   }
 
   if (learner_id == "classif.ranger") {
-    nfeats = sum(z$mlr.task$task.desc$n.feat)
+    nfeats = sum(task$mlr.task$task.desc$n.feat)
     if (task %in% c(3, 219, 15)) nfeats = round(0.8*nfeats)
     hpars[["mtry"]] = max(min(round(hpars[["mtry"]]), nfeats), 1)
   }
