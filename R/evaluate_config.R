@@ -14,7 +14,8 @@
 #'  @param seed `character`\cr
 #'    Seed to set. Defaults to `NULL` (no seed).
 #'  @param extra_metrics `list`\cr
-#'    Additional metrics to compute. List of mlr metrics.
+#'    Additional metrics to compute. List of mlr metrics. Metrics that are always returned:
+#'    `mlr::acc, mlr::bac, mlr::auc, mlr::multiclass.aunp, mlr::logloss, mlr::multiclass.brier, mlr::f1, mlr::mcc, mlr::timetrain, mlr::timepredict`.
 #' @export
 #' @examples
 #'   learner_id = "classif.svm"
@@ -22,7 +23,9 @@
 #'   configuration = list("gamma" = 0.1, cost  = 10, sample.rate = .1)
 #'   eval_config(learner_id, task_id, configuration)
 eval_config = function(learner, task_id, configuration, parallel = NULL, logfile = NULL, seed = NULL,
-  extra_metrics = list(mlr::logloss, mlr::mmce, mlr::auc, mlr::f1, mlr::timetrain, mlr::timepredict)) {
+  extra_metrics = list()) {
+  base_metrics = list(mlr::acc, mlr::bac, mlr::auc, mlr::multiclass.aunp, mlr::logloss, mlr::multiclass.brier, mlr::f1, mlr::mcc, mlr::timetrain, mlr::timepredict)
+  extra_metrics = c(base_metrics, extra_metrics)
   assert_list(configuration)
   task_id = fix_task(task_id)
   learner_id = assert_choice(learner, paste0("classif.", c("rpart","glmnet","svm","RcppHNSW","ranger.pow","xgboost")))
