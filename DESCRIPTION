@@ -2,7 +2,7 @@ Package: rbv2
 Title: Reproduce results from randombot-ng
 Version: 0.0.0.9000
 Authors@R: 
-    person("Florian", "Pfisterer", "pfistererf@googlemail.com", role = c("aut", "cre"))
+    person(given = "Florian", family = "Pfisterer", email = "pfistererf@googlemail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8867-762X"))
 Description: Reproduce results from the randombot-ng including seeds.
 License: GPL (>= 3)
 Encoding: UTF-8
