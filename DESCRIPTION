@@ -11,7 +11,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: 
     BBmisc (== 1.11),
-    mlr (== 2.13.9000),
+    mlr (== 2.14),
     mlrCPO (== 0.3.4-2),
     R (>= 3.5)
 Imports:
