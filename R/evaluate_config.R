@@ -123,8 +123,9 @@ eval_rbv2 = function(learner, task_id, configuration, ...) {
 }
 
 #' Run a yahpo gym config
-#'  @param instance `character`\cr
-#'    Instance (e.g. `rbv2_super`) to evaluate.
+#' Returns a data.table
+#'  @param scenario `character`\cr
+#'    Scenario (e.g. `rbv2_super`) to evaluate.
 #'  @param configuration `list`\cr
 #'    Named list of hyperparameters including task_id and learner.
 #'  @param ... `any`\cr
@@ -133,12 +134,14 @@ eval_rbv2 = function(learner, task_id, configuration, ...) {
 #' @examples
 #'   configuration = list("gamma" = 0.1, cost  = 10, sample.rate = .1, task_id = 3, learner_id = "rbv2_svm")
 #'   eval_rbv2(learner_id, task_id, configuration)
-eval_yahpo = function(instance, configuration, ...) {
+eval_yahpo = function(scenario, configuration, ...) {
   task_id = configuration$task_id
-  learner = instance
+  learner = scenario
   repl = configuration$repl
   configuration = configuration[-which(names(configuration) %in% c("task_id", "repl"))]
-  eval_rbv2(learner, task_id, configuration, ...)
+  out = eval_rbv2(learner, task_id, configuration, ...)
+  out = getBMRPerformances(out)[[1]][[1]]
+  as.list(out[out$iter == repl,])
 }
 
 
