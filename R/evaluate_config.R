@@ -56,6 +56,7 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   z = OpenML::convertOMLTaskToMlr(omltsk, measures = mmce)
   configuration = set_task_hyperpars(configuration, z, learner_id)
   lrn = setHyperPars(lrn, par.vals = configuration)
+
   lgr$info(sprintf("Hyperparameters: %s", config_to_string(configuration)))
   if (!is.null(seed)) {
     assert_int(seed)
@@ -66,7 +67,8 @@ eval_config = function(learner, task_id, configuration, parallel = NULL, logfile
   if (length(z$mlr.task$task.desc$class.levels) > 2) {
     extra_metrics = extra_metrics[map_lgl(extra_metrics, function(x) "classif.multi" %in% x$properties)]
   }
-  bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = union(z$mlr.measures, extra_metrics))
+  measures = unique_measures(c(z$mlr.measures, extra_metrics))
+  bmr = benchmark(lrn, z$mlr.task, z$mlr.rin, measures = measures)
   aggr = bmr$results[[1]][[1]]$aggr
   lgr$info(sprintf("Result: %s: %s", names(aggr), aggr))
   return(bmr)
@@ -118,6 +120,25 @@ eval_rbv2 = function(learner, task_id, configuration, ...) {
 
   task_id = data_to_task_id(task_id)
   eval_config(learner, task_id, configuration, ...)
+}
+
+#' Run a yahpo gym config
+#'  @param instance `character`\cr
+#'    Instance (e.g. `rbv2_super`) to evaluate.
+#'  @param configuration `list`\cr
+#'    Named list of hyperparameters including task_id and learner.
+#'  @param ... `any`\cr
+#'    Arguments passed on to `eval_config`.
+#' @export
+#' @examples
+#'   configuration = list("gamma" = 0.1, cost  = 10, sample.rate = .1, task_id = 3, learner_id = "rbv2_svm")
+#'   eval_rbv2(learner_id, task_id, configuration)
+eval_yahpo = function(instance, configuration, ...) {
+  task_id = configuration$task_id
+  learner = instance
+  repl = configuration$repl
+  configuration = configuration[-which(names(configuration) %in% c("task_id", "repl"))]
+  eval_rbv2(learner, task_id, configuration, ...)
 }
 
 

@@ -90,3 +90,8 @@ config_to_string = function(configuration) {
   xs = paste0(names(configuration), ":", unlist(configuration))
   paste0(xs, collapse=" ")
 }
+
+unique_measures = function(measures) {
+  mid = map_chr(measures, "id")
+  measures[unique(match(mid, unique(mid)))]
+}
